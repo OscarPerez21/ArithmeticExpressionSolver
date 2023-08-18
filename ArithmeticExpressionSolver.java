@@ -46,7 +46,7 @@ public String resolve(String operacion){
         return(resolveOperation(operacion));
     }
 
-    public String resolverClase(String operacion){
+    private String resolverClase(String operacion){
         String temp= "", resultado= ""; int posParenth= operaciones1;
         if(operacion.charAt(operaciones1)=='('){
             while(true){
@@ -66,7 +66,7 @@ public String resolve(String operacion){
         return operacion;
     }
 
-    public String resolveOperation(String cadena){
+    private String resolveOperation(String cadena){
         operaciones2= 0; operaciones3= 0; operaciones4= 0;
         //determinar numero de operadores
         for(int i=0; i<cadena.length(); i++){
