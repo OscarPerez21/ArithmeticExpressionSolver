@@ -90,7 +90,7 @@ public String resolve(String operacion){
     // funciones extra //
 
     private String resolverOrden(String cadena, int numOperadores, char c1, char c2){
-        String resultado= "";
+        indice= 0; String resultado= "";
         Float valorA= 0f, valorB= 0f;
         System.out.println(cadena);
         while(true){
@@ -131,6 +131,7 @@ public String resolve(String operacion){
                 System.out.println(cadena);
             }
             if(numOperadores==0){ indice= 0; break; }
+            if(indice==cadena.length()-1){ break;}
             indice++;
         }
         return cadena;
