@@ -35,7 +35,6 @@ public String resolve(String operacion){
                 if(nivel==maxNivel && parenthPorNivel[maxNivel-1]>0){
                     parenthPorNivel[maxNivel-1]--;
                     operacion= resolverClase(operacion);
-                    System.out.println("operacion: "+operacion);
                     operaciones1--;
                 }
                 operaciones1++;
@@ -96,20 +95,7 @@ public String resolve(String operacion){
         while(true){
             String tempString= "";
             if(cadena.charAt(indice)==c1||cadena.charAt(indice)==c2 && cadena.charAt(0)!='-'){
-                valorA= foundValorA(cadena);
-                valorB= foundValorB(cadena);
-                String str= operar(cadena.charAt(indice), valorA, valorB);
 
-                if(str.charAt(0)!='-' && cadena.charAt(0)!='+'){ str= "+"+str;}
-                
-                cadena= insertInSpace(cadena, pos1, pos2, str);
-                if(cadena.charAt(0)=='+'){
-                    for(int i=1; i<cadena.length(); i++){
-                        if(cadena.charAt(i)=='+'&& cadena.charAt(i+1)=='+'){ i++;}
-                        tempString+= cadena.charAt(i);
-                    }
-                    cadena= tempString;
-                }
                 tempString= "";
                 for(int i=0; i<cadena.length(); i++){
                     String signos= ""; signos+=cadena.charAt(i);
@@ -126,6 +112,22 @@ public String resolve(String operacion){
                     }      
                 }
                 cadena= tempString;
+                
+                valorA= foundValorA(cadena);
+                valorB= foundValorB(cadena);
+                System.out.println("operar: "+cadena);
+                String str= operar(cadena.charAt(indice), valorA, valorB);
+
+                if(str.charAt(0)!='-' && cadena.charAt(0)!='+'){ str= "+"+str;}
+                
+                cadena= insertInSpace(cadena, pos1, pos2, str);
+                if(cadena.charAt(0)=='+'){
+                    for(int i=1; i<cadena.length(); i++){
+                        if(cadena.charAt(i)=='+'&& cadena.charAt(i+1)=='+'){ i++;}
+                        tempString+= cadena.charAt(i);
+                    }
+                    cadena= tempString;
+                }
 
                 numOperadores--;
                 System.out.println(cadena);
