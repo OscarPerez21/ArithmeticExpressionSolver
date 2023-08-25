@@ -3,8 +3,9 @@ public class ArithmeticExpressionSolver{
     private int operaciones1= 0, operaciones2= 0, operaciones3= 0, operaciones4= 0, maxNivel= 0, nivel= 0;;
     private int indice= 0, pos1=0, pos2= 0;
 
-public String resolve(String operacion){
-    operaciones1= 0;
+    /*------- analiza y determina el orden de desarrollo -------*/
+    public String resolve(String operacion){
+        operaciones1= 0;
         //determinar cuántos niveles de parentesis hay
         String[] parenth= operacion.replaceAll("[^\\(\\)]", "").split("");
         for(int i=0; i<parenth.length; i++){
@@ -30,29 +31,32 @@ public String resolve(String operacion){
         if(maxNivel>0){
             System.out.println(operacion);
             while(true){
+                if(maxNivel==0){ break; }
                 if(operacion.charAt(operaciones1)=='('){ nivel++; } 
                 if(operacion.charAt(operaciones1)==')'){ nivel--; }
                 if(nivel==maxNivel && parenthPorNivel[maxNivel-1]>0){
                     parenthPorNivel[maxNivel-1]--;
                     operacion= resolverClase(operacion);
+                    System.out.println(operacion);
                     operaciones1--;
                 }
                 operaciones1++;
-                if(parenthPorNivel[maxNivel-1]<=0){ maxNivel--; operaciones1= 0; nivel= 0; System.out.println();}
-                if(maxNivel==0){ break; }
+                if(parenthPorNivel[maxNivel-1]<=0){ maxNivel--; operaciones1= 0; nivel= 0; }
             }
         }
         return(resolveOperation(operacion));
     }
 
+    /*------- resuelve la operación según nivel de los paréntesis -------*/
+
     private String resolverClase(String operacion){
-        String temp= "", resultado= ""; int posParenth= operaciones1;
+        String temp= "", resultado= ""; int posParenth= operaciones1, recorrido= 0;
         if(operacion.charAt(operaciones1)=='('){
             while(true){
                 if(operacion.charAt(operaciones1)=='('){ operacion= deleteChar(operacion, operaciones1); }
-                if(operacion.charAt(operaciones1)==')'){ operacion= deleteChar(operacion, operaciones1); operaciones1-=2; nivel--; break; }
+                if(operacion.charAt(operaciones1)==')'){ operacion= deleteChar(operacion, operaciones1); operaciones1-= recorrido; nivel--; break; }
                 temp+= operacion.charAt(operaciones1);
-                operaciones1++;
+                operaciones1++; recorrido++;
             }
         }
 
@@ -65,16 +69,15 @@ public String resolve(String operacion){
         return operacion;
     }
 
+    /*------- desarrolla operaciones según nivel de jerarquía -------*/
+
     private String resolveOperation(String cadena){
         operaciones2= 0; operaciones3= 0; operaciones4= 0;
-        //determinar numero de operadores
         for(int i=0; i<cadena.length(); i++){
             if(cadena.charAt(i)=='*'||cadena.charAt(i)=='/'){ operaciones3++; }
             if(cadena.charAt(i)=='^'){ operaciones2++; }
         }
 
-        //resolver operaciones individuales
-       //System.out.println(cadena);
         cadena= resolverOrden(cadena, operaciones2, '^', '^');
         cadena= resolverOrden(cadena, operaciones3, '*', '/');
         for(int i=0; i<cadena.length(); i++){
@@ -86,41 +89,24 @@ public String resolve(String operacion){
         return cadena;
     }
 
-    // funciones extra //
+    /*------- opera los valores A y B según nivel de importancia -------*/
 
     private String resolverOrden(String cadena, int numOperadores, char c1, char c2){
         indice= 0; String resultado= "";
         Float valorA= 0f, valorB= 0f;
-        System.out.println(cadena);
         while(true){
             String tempString= "";
             if(cadena.charAt(indice)==c1||cadena.charAt(indice)==c2 && cadena.charAt(0)!='-'){
 
-                tempString= "";
-                for(int i=0; i<cadena.length(); i++){
-                    String signos= ""; signos+=cadena.charAt(i);
-                    if(i<cadena.length()-1){ signos+= cadena.charAt(i+1); }
-                    switch(signos){
-                        case "+-": tempString+= "-"; i++; break;
-                        case "-+": tempString+= "-"; i++; break;
-                        case "--": tempString+= "+"; i++; break;
-                        case "++": tempString+= "+"; i++; break;
-                        case "/+": tempString+= "/"; i++; break;
-                        case "*+": tempString+= "*"; i++; break;
-                        case "^+": tempString+= "^"; i++; break;
-                        default: tempString+= cadena.charAt(i);
-                    }      
-                }
-                cadena= tempString;
-                
+                cadena= resolverSignos(cadena);
                 valorA= foundValorA(cadena);
                 valorB= foundValorB(cadena);
-                System.out.println("operar: "+cadena);
                 String str= operar(cadena.charAt(indice), valorA, valorB);
 
                 if(str.charAt(0)!='-' && cadena.charAt(0)!='+'){ str= "+"+str;}
                 
                 cadena= insertInSpace(cadena, pos1, pos2, str);
+                tempString= "";
                 if(cadena.charAt(0)=='+'){
                     for(int i=1; i<cadena.length(); i++){
                         if(cadena.charAt(i)=='+'&& cadena.charAt(i+1)=='+'){ i++;}
@@ -128,9 +114,9 @@ public String resolve(String operacion){
                     }
                     cadena= tempString;
                 }
+                cadena= resolverSignos(cadena);
 
                 numOperadores--;
-                System.out.println(cadena);
             }
             if(numOperadores==0){ indice= 0; break; }
             if(indice==cadena.length()-1){ break;}
@@ -139,15 +125,21 @@ public String resolve(String operacion){
         return cadena;
     }
 
+    /*------- realizar operaciones según signo -------*/
+
     private String operar(char operador, Float valorA, Float valorB){
-        Float resultado= valorA;
+        Float resultado= 0f;
         String regresar= "";
         switch(operador){
             case '*': resultado= valorA*valorB; break;
             case '/': resultado= valorA/valorB; break;
             case '+': resultado= valorA+valorB; break;
             case '-': resultado= valorA-valorB; break;
-            case '^': for(int i=0; i<valorB; i++){ resultado*= valorA; break; }
+            case '^':
+                String tempResultado= "";
+                tempResultado= Double.toString(Math.pow(valorA, valorB));
+                resultado= Float.parseFloat(tempResultado);
+                break;
         }
         regresar= Float.toString(resultado);
         if(regresar.charAt(regresar.length()-1)=='0' && regresar.charAt(regresar.length()-2)=='.'){
@@ -160,15 +152,28 @@ public String resolve(String operacion){
         return regresar;
     }
 
-    /*Elimina una seccion determinada y la reemplaza por un texto*/
-    private String insertInSpace(String texto, int pos1, int pos2, String text){
-        String resultado= "";
-        for(int i=0; i<texto.length(); i++){
-            if(i==pos1){ resultado+= text; i+= (pos2-pos1); }
-            else{ resultado+= texto.charAt(i); }
+    /*------- corregir duplicidad de signos -------*/
+
+    private String resolverSignos(String cadena){
+        String tempString= "";
+        for(int i=0; i<cadena.length(); i++){
+            String signos= ""; signos+=cadena.charAt(i);
+            if(i<cadena.length()-1){ signos+= cadena.charAt(i+1); }
+            switch(signos){
+                case "+-": tempString+= "-"; i++; break;
+                case "-+": tempString+= "-"; i++; break;
+                case "--": tempString+= "+"; i++; break;
+                case "++": tempString+= "+"; i++; break;
+                case "/+": tempString+= "/"; i++; break;
+                case "*+": tempString+= "*"; i++; break;
+                case "^+": tempString+= "^"; i++; break;
+                default: tempString+= cadena.charAt(i);
+            }      
         }
-        return resultado;
+        return tempString;
     }
+
+    /*------- encontrar los valosres A y B a operar -------*/
 
     private float foundValorA(String cadena){
         String temp= ""; float resultado= 0;
@@ -201,7 +206,8 @@ public String resolve(String operacion){
         return resultado;
     }
 
-    /*-----------------*/
+    /*-------- funciones reutilizables ---------*/
+
     private static String invertirCadena(String cadena) {
         String cadenaInvertida = "";
         for (int i = cadena.length() - 1; i >= 0; i--) {
@@ -214,6 +220,15 @@ public String resolve(String operacion){
         String resultado= "";
         for(int i=0; i<texto.length(); i++){
             if(!(i==pos)){ resultado+= texto.charAt(i); }
+        }
+        return resultado;
+    }
+
+    private String insertInSpace(String texto, int pos1, int pos2, String text){
+        String resultado= "";
+        for(int i=0; i<texto.length(); i++){
+            if(i==pos1){ resultado+= text; i+= (pos2-pos1); }
+            else{ resultado+= texto.charAt(i); }
         }
         return resultado;
     }
