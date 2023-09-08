@@ -15,7 +15,6 @@ public class ArithmeticExpressionSolver{
             }
             if(parenth[i].equals(")")){ nivel--; }
         }
-
         //determinar cuantos grupos de parentesis hay en cada nivel
         int[] parenthPorNivel= new int[maxNivel];
         for(int i=0; i<maxNivel; i++){ parenthPorNivel[i]= 0; }
@@ -27,7 +26,6 @@ public class ArithmeticExpressionSolver{
             }
             if(parenth[i].equals(")")){ nivel--; }
         }
-
         if(maxNivel>0){
             System.out.println(operacion);
             while(true){
@@ -83,7 +81,8 @@ public class ArithmeticExpressionSolver{
         for(int i=0; i<cadena.length(); i++){
             if(cadena.charAt(i)=='+'||cadena.charAt(i)=='-'){ operaciones4++; }
         }
-        if(operaciones4== 1 && cadena.charAt(0)=='-'){ operaciones4--; }
+
+        if(operaciones4== 2 && cadena.charAt(0)=='-'){ operaciones4--; }
         cadena= resolverOrden(cadena, operaciones4, '+', '-');
 
         return cadena;
@@ -94,9 +93,10 @@ public class ArithmeticExpressionSolver{
     private String resolverOrden(String cadena, int numOperadores, char c1, char c2){
         indice= 0; String resultado= "";
         Float valorA= 0f, valorB= 0f;
+        if(cadena.charAt(0)=='-'){ indice++; }
         while(true){
             String tempString= "";
-            if(cadena.charAt(indice)==c1||cadena.charAt(indice)==c2 && cadena.charAt(0)!='-'){
+            if(cadena.charAt(indice)==c1||cadena.charAt(indice)==c2){
 
                 cadena= resolverSignos(cadena);
                 valorA= foundValorA(cadena);
