@@ -1,6 +1,6 @@
 public class ArithmeticExpressionSolver{
 
-    private int operaciones1= 0, operaciones2= 0, operaciones3= 0, operaciones4= 0, maxNivel= 0, nivel= 0;;
+    private int operaciones1= 0, operaciones2= 0, operaciones3= 0, operaciones4= 0, maxNivel= 0, nivel= 0;
     private int indice= 0, pos1=0, pos2= 0;
 
     /*------- analiza y determina el orden de desarrollo -------*/
